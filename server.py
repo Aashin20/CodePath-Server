@@ -8,10 +8,13 @@ from groq import Groq
 import json
 from dotenv import load_dotenv
 
+#Grok
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 groq_client = Groq(api_key=GROQ_API_KEY)
 
+
+#Initializing FastAPI
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -21,11 +24,16 @@ app.add_middleware(
     allow_credentials=True,
 )
 
+#Pydantic Models:
 
 class QuestionDetails(BaseModel):
     question : str
     language : str
 
+
+#Functions:
+
+#Function for querying LLM
 def response(question, language):
     prompts = {
         "javascript": """Generate a JSON object that represents a coding question in JavaScript. The object should include:
@@ -391,16 +399,22 @@ def response(question, language):
         )
 
 
+#EndPoints:
 
+#Endpoint for text questions
 @app.post('/generatecode')
 async def generate_code(request: QuestionDetails):
     return response(question=request.question, language=request.language)
         
 
-
+#Endpoint for health check
 @app.get("/health")
 async def health():
     return {"200": "OK"}
+
+
+
+
 
 if __name__ == "__main__":
     import uvicorn
