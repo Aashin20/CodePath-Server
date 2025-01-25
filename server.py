@@ -26,7 +26,8 @@ class GenerateCode(BaseModel):
     prompt : str
     language : str
 
-
+def response(question):
+    pass
 prompts = {
      "javascript": """Generate a JSON object that represents a coding question in JavaScript. The object should include:
 - "question" as a string describing the coding question.
@@ -369,27 +370,24 @@ async def generate_code(request: GenerateCode):
 
         generated_code = completion.choices[0].message.content
         
-        # Print raw response for debugging
+    
         print("Raw response:", generated_code)
 
-        # Clean the response more thoroughly
         generated_code = generated_code.strip()
         
-        # Remove markdown code blocks if present
+     
         if generated_code.startswith("```"):
             lines = generated_code.split("\n")
-            # Remove first and last lines if they're markdown
+    
             if lines[0].startswith("```"):
                 lines = lines[1:]
             if lines[-1].startswith("```"):
                 lines = lines[:-1]
             generated_code = "\n".join(lines)
 
-        # Remove any leading/trailing whitespace again
         generated_code = generated_code.strip()
 
         try:
-            # Try to parse JSON
             parsed_code = json.loads(generated_code)
             return {"code": parsed_code}
         except json.JSONDecodeError as json_error:
