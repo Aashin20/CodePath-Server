@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from groq import Groq
 import json
 from dotenv import load_dotenv
+import requests
 
 #Grok
 load_dotenv()
@@ -402,20 +403,61 @@ def response(question, language):
             detail=f"Error generating code: {str(e)}"
         )
 
+#Function for fetching qn description from leetcode
+def leetcode_description(title_slug):
+    url = "https://leetcode.com/graphql"
+    
+  
+    query = """
+    query questionData($titleSlug: String!) {
+        question(titleSlug: $titleSlug) {
+            questionId
+            questionFrontendId
+            title
+            content
+            difficulty
+            topicTags {
+                name
+            }
+        }
+    }
+    """
+    
 
+    headers = {
+        "Content-Type": "application/json",
+        "Referer": "https://leetcode.com"
+    }
+
+    body = {
+        "query": query,
+        "variables": {
+            "titleSlug": title_slug
+        }
+    }
+    
+ 
+    response = requests.post(url, headers=headers, json=body)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Error: {response.status_code}"
+    
+
+    
 #EndPoints:
 
 #Endpoint for text questions
 @app.post('/question')
-async def generate_code(request: QuestionDetails):
-    return response(question=request.question, language=request.language)
+async def text_qn(details: TextDetails):
+    return response(question=details.question, language=details.language)
         
 
 #Endpoint for leetcode questions
 @app.post('/leetcode')
-
-
-
+async def leetcode_qn(details: LeetcodeDetails):
+    pass
 
 
 
