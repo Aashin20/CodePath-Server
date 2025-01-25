@@ -39,7 +39,7 @@ class LeetcodeDetails(BaseModel):
 #Functions:
 
 #Function for querying LLM
-def response(question, language):
+async def response(question, language):
     prompts = {
         "javascript": """Generate a JSON object that represents a coding question in JavaScript. The object should include:
     - "question" as a string describing the coding question.
@@ -404,7 +404,7 @@ def response(question, language):
         )
 
 #Function for fetching qn description from leetcode
-def leetcode_description(title_slug):
+async def leetcode_description(title_slug):
     url = "https://leetcode.com/graphql"
     
     query = """
@@ -442,7 +442,7 @@ def leetcode_description(title_slug):
         raise HTTPException(status_code=500, detail=f"LeetCode API error: {str(e)}")
     
 #Function for fetching problem from id
-def leetcode_problem(frontend_id):
+async def leetcode_problem(frontend_id):
     try:
         problems_response = requests.get("https://leetcode.com/api/problems/algorithms/")
         problems_data = problems_response.json()
