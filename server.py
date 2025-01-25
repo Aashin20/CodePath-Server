@@ -26,9 +26,13 @@ app.add_middleware(
 
 #Pydantic Models:
 
-class QuestionDetails(BaseModel):
+class TextDetails(BaseModel):
     question : str
     language : str
+
+class LeetcodeDetails(BaseModel):
+    question_id: str
+    language:str
 
 
 #Functions:
@@ -402,10 +406,19 @@ def response(question, language):
 #EndPoints:
 
 #Endpoint for text questions
-@app.post('/generatecode')
+@app.post('/question')
 async def generate_code(request: QuestionDetails):
     return response(question=request.question, language=request.language)
         
+
+#Endpoint for leetcode questions
+@app.post('/leetcode')
+
+
+
+
+
+
 
 #Endpoint for health check
 @app.get("/health")
