@@ -444,8 +444,28 @@ def leetcode_description(title_slug):
     else:
         return f"Error: {response.status_code}"
     
-
+#Function for fetching problem from id
+def leetcode_problem(frontend_id):
+    problems_response = requests.get("https://leetcode.com/api/problems/algorithms/")
+    problems_data = problems_response.json()
     
+
+    target_problem = None
+    for problem in problems_data['stat_status_pairs']:
+        if problem['stat']['frontend_question_id'] == frontend_id:
+            target_problem = problem
+            break
+    
+    if not target_problem:
+        return "Problem not found"
+    
+    
+    title_slug = target_problem['stat']['question__title_slug']
+    
+    
+    return leetcode_description(title_slug)
+
+
 #EndPoints:
 
 #Endpoint for text questions
