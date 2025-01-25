@@ -476,7 +476,11 @@ async def text_qn(details: TextDetails):
     return response(question=details.question, language=details.language)
         
 
-
+#Endpoint for leetcode questions
+@app.post('/leetcode')
+async def leetcode_qn(details: LeetcodeDetails):
+    description=leetcode_problem(frontend_id=details.question_id)["data"]["question"]["content"]
+    return response(description,language=details.language)
 
 
 
