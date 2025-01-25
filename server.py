@@ -22,8 +22,8 @@ app.add_middleware(
 )
 
 
-class GenerateCode(BaseModel):
-    prompt : str
+class QuestionDetails(BaseModel):
+    question : str
     language : str
 
 def response(question, language):
@@ -390,11 +390,11 @@ def response(question, language):
             detail=f"Error generating code: {str(e)}"
         )
 
- 
+
 
 @app.post('/generatecode')
-async def generate_code(request: GenerateCode):
-    pass
+async def generate_code(request: QuestionDetails):
+    return response(question=request.question, language=request.language)
         
 
 
