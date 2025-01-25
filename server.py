@@ -32,7 +32,7 @@ class TextDetails(BaseModel):
     language : str
 
 class LeetcodeDetails(BaseModel):
-    question_id: str
+    question_id: int
     language:str
 
 
@@ -407,7 +407,6 @@ def response(question, language):
 def leetcode_description(title_slug):
     url = "https://leetcode.com/graphql"
     
-  
     query = """
     query questionData($titleSlug: String!) {
         question(titleSlug: $titleSlug) {
@@ -423,7 +422,6 @@ def leetcode_description(title_slug):
     }
     """
     
-
     headers = {
         "Content-Type": "application/json",
         "Referer": "https://leetcode.com"
@@ -436,34 +434,38 @@ def leetcode_description(title_slug):
         }
     }
     
- 
-    response = requests.post(url, headers=headers, json=body)
-    
-    if response.status_code == 200:
+    try:
+        response = requests.post(url, headers=headers, json=body)
+        response.raise_for_status() 
         return response.json()
-    else:
-        return f"Error: {response.status_code}"
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"LeetCode API error: {str(e)}")
     
 #Function for fetching problem from id
 def leetcode_problem(frontend_id):
-    problems_response = requests.get("https://leetcode.com/api/problems/algorithms/")
-    problems_data = problems_response.json()
-    
+    try:
+        problems_response = requests.get("https://leetcode.com/api/problems/algorithms/")
+        problems_data = problems_response.json()
 
-    target_problem = None
-    for problem in problems_data['stat_status_pairs']:
-        if problem['stat']['frontend_question_id'] == frontend_id:
-            target_problem = problem
-            break
+        target_problem = None
+        for problem in problems_data['stat_status_pairs']:
+            if problem['stat']['frontend_question_id'] == frontend_id:
+                target_problem = problem
+                break
     
-    if not target_problem:
-        return "Problem not found"
+        if not target_problem:
+            raise HTTPException(status_code=404, detail="Problem not found")
     
-    
-    title_slug = target_problem['stat']['question__title_slug']
-    
-    
-    return leetcode_description(title_slug)
+        title_slug = target_problem['stat']['question__title_slug']
+        result = leetcode_description(title_slug)
+        
+        if isinstance(result, str):  
+            raise HTTPException(status_code=500, detail=result)
+            
+        return result  
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 #EndPoints:
@@ -474,10 +476,7 @@ async def text_qn(details: TextDetails):
     return response(question=details.question, language=details.language)
         
 
-#Endpoint for leetcode questions
-@app.post('/leetcode')
-async def leetcode_qn(details: LeetcodeDetails):
-    pass
+
 
 
 
