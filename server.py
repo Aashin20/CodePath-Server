@@ -10,8 +10,15 @@ from dotenv import load_dotenv
 import requests
 from Integrations.leetcode import leetcode_problem
 from prompt import response,send_evaluation
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
+from datetime import datetime
 
-
+load_dotenv()
+MONGO_URI = os.getenv("MONGO_URI")
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
+db = client["Questions"]
+collection = db["Elab Questions"]
 
 
 #Initializing FastAPI
@@ -39,6 +46,10 @@ class Evaluate(BaseModel):
     language: str
     code: str
 
+class Content(BaseModel):
+    content: str
+    timestamp: datetime
+
 #EndPoints:
 
 #Endpoint for text questions
@@ -56,6 +67,33 @@ async def leetcode_qn(details: LeetcodeDetails):
 @app.post('/evaluate')
 async def evaluate_qn(content: Evaluate):    
     return send_evaluation(steps=content.steps,language=content.language,code=content.code)
+
+
+@app.post("/save-content")
+async def save_content(content: Content):
+    try:
+        result = collection.insert_one({
+            "content": content.content,
+            "timestamp": content.timestamp
+        })
+        
+        return {
+            "success": True,
+            "message": "Content saved successfully",
+            "id": str(result.inserted_id)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print (e)
+
+
 
 
 #Endpoint for health check
