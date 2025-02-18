@@ -46,9 +46,6 @@ class Evaluate(BaseModel):
     language: str
     code: str
 
-class Content(BaseModel):
-    content: str
-    timestamp: datetime
 
 #EndPoints:
 
@@ -69,12 +66,12 @@ async def evaluate_qn(content: Evaluate):
     return send_evaluation(steps=content.steps,language=content.language,code=content.code)
 
 
-@app.post("/save-content")
-async def save_content(content: Content):
+@app.post("/saveqn")
+async def save_content(question:str):
     try:
         result = collection.insert_one({
-            "content": content.content,
-            "timestamp": content.timestamp
+            "question": question,
+            "timestamp": question.timestamp
         })
         
         return {
