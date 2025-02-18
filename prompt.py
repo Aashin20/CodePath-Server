@@ -57,12 +57,13 @@ def response(question, language):
     """,
       "cpp": """Generate a JSON object that represents a coding question in C++. The object should include:
     - "description" give a concise explanation about the question in about 50 words. DONT MENTION ANYTHING ABOUT THE SOLUTION
-    - "steps" as an array where each element is an object with the following keys:
-      - "step_id" as a number indicating the step's serial number.
+     - "steps" as an array where each element is an object with the following keys:
+      - "completed" a integer value which is 0 for the first step and -1 for all other steps
       - "step_title" as a string describing the step.
       - "code" as a string representing the code needed for this step.
       - "desired_output" as a string describing the expected output of the code, if any.
       - "hint" as a string providing a hint to help with the step.
+
 
     Ensure that each step's code is executable in isolation, and the final code can be constructed by combining all the steps. Include elements like function declarations, return statements, and proper use of C++ syntax.
 
@@ -106,12 +107,13 @@ def response(question, language):
 
     "python": """Generate a JSON object that represents a coding question in Python. The object should include:
     - "description" give a concise explanation about the question in about 50 words. DONT MENTION ANYTHING ABOUT THE SOLUTION
-    - "steps" as an array where each element is an object with the following keys:
-      - "step_id" as a number indicating the step's serial number.
+     - "steps" as an array where each element is an object with the following keys:
+      - "completed" a integer value which is 0 for the first step and -1 for all other steps
       - "step_title" as a string describing the step.
       - "code" as a string representing the code needed for this step.
       - "desired_output" as a string describing the expected output of the code, if any.
       - "hint" as a string providing a hint to help with the step.
+
 
     Ensure that each step's code is executable in isolation, and the final code can be constructed by combining all the steps. Include function definitions, return statements, and proper use of Python syntax.
 
