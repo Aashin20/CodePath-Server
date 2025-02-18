@@ -23,7 +23,7 @@ def response(question, language):
       - "desired_output" as a string describing the expected output of the code, if any.
       - "hint" as a string providing a hint to help with the step.
 
-    Ensure that each step's code is executable in isolation, and the final code can be constructed by combining all the steps. Include essential elements like function definitions, return statements, and method calls.
+    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in JavaScript?":
     {
@@ -65,7 +65,7 @@ def response(question, language):
       - "hint" as a string providing a hint to help with the step.
 
 
-    Ensure that each step's code is executable in isolation, and the final code can be constructed by combining all the steps. Include elements like function declarations, return statements, and proper use of C++ syntax.
+    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in C++?":
     {
@@ -115,7 +115,7 @@ def response(question, language):
       - "hint" as a string providing a hint to help with the step.
 
 
-    Ensure that each step's code is executable in isolation, and the final code can be constructed by combining all the steps. Include function definitions, return statements, and proper use of Python syntax.
+    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in Python?":
     {
