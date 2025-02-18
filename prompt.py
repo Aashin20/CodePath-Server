@@ -23,7 +23,7 @@ def response(question, language):
       - "desired_output" as a string describing the expected output of the code, if any.
       - "hint" as a string providing a hint to help with the step.
 
-    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Include essential elements like function definitions, return statements, and method calls.
+    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in JavaScript?":
     {
@@ -65,7 +65,7 @@ def response(question, language):
       - "hint" as a string providing a hint to help with the step.
 
 
-    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Include essential elements like function definitions, return statements, and method calls.
+    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in C++?":
     {
@@ -115,7 +115,7 @@ def response(question, language):
       - "hint" as a string providing a hint to help with the step.
 
 
-    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Include essential elements like function definitions, return statements, and method calls.
+    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in Python?":
     {
@@ -135,13 +135,6 @@ def response(question, language):
           "desired_output": "",
           "hint": "Perform the addition of the two parameters and return the result."
         },
-        {
-          "completed":-1,
-          "step_title": "Add a test case",
-          "code": "print(add_two_numbers(5, 3))",
-          "desired_output": "Prints the sum of the numbers.",
-          "hint": "Add a test case to check if the function works correctly."
-        }
       ],
       "language": "Python"
     }
@@ -220,7 +213,7 @@ The evaluation should consider:
 2. Syntax correctness and adherence to the language's rules.
 3. The logic and overall structure of the code provided by the user.
 
-Return the steps as it is after adding the above JSON and updating the completed value
+Return the steps as it is after adding the above JSON and updating the completed value. DO NOT ADD OR REMOVE ANY STEPS
 Note: Evaluate the user's code against all steps and mark each step as:
 1: completed step
 0: current step (partially complete or in progress)
