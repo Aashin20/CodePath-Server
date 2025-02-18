@@ -213,9 +213,6 @@ Please evaluate the user's code for the steps in the specified language and retu
 
 {{
   "feedback": "Provide detailed feedback about the correctness and quality of the user's code, including any issues related to logic, syntax, or code structure.",
-  "hints": ["Hint 1", "Hint 2"],
-  "completed": [1, 0, -1],
-  "nextStep": "Provide guidance for the next step, or an empty string if all steps is completed."
 }}
 
 The evaluation should consider:
@@ -223,19 +220,7 @@ The evaluation should consider:
 2. Syntax correctness and adherence to the language's rules.
 3. The logic and overall structure of the code provided by the user.
 
-### Full process details:
-{{
-  "language": "{language}",
-  "steps": [
-    {','.join([f'''
-    {{
-      "step_title": "{step['step_title']}",
-      "code": "{step['code']}",
-      "hint": "{step['hint']}"
-    }}''' for step in steps_array])}
-  ]
-}}
-
+Return the steps as it is after adding the above JSON and updating the completed value
 Note: Evaluate the user's code against all steps and mark each step as:
 1: completed step
 0: current step (partially complete or in progress)
