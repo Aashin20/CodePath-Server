@@ -46,7 +46,9 @@ class Evaluate(BaseModel):
     language: str
     code: str
 
-
+class QuestionModel(BaseModel):
+    question: str
+    
 #EndPoints:
 
 #Endpoint for text questions
@@ -67,13 +69,12 @@ async def evaluate_qn(content: Evaluate):
 
 
 @app.post("/saveqn")
-async def save_content(question:str):
+async def save_content(question_data: QuestionModel):
     try:
+        qn = ' '.join(question_data.question.split("Constraints")[0].split())
         result = collection.insert_one({
-            "question": question,
-            "timestamp": question.timestamp
+            "question": qn,
         })
-        
         return {
             "success": True,
             "message": "Content saved successfully",
@@ -81,7 +82,6 @@ async def save_content(question:str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 try:
