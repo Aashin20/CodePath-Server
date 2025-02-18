@@ -1,4 +1,6 @@
-#Function for fetching qn description from leetcode
+import requests
+from fastapi import FastAPI, HTTPException
+
 def leetcode_description(title_slug):
     url = "https://leetcode.com/graphql"
     
