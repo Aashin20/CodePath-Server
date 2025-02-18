@@ -9,7 +9,7 @@ import json
 from dotenv import load_dotenv
 import requests
 from Integrations.leetcode import leetcode_problem
-from prompt import response
+from prompt import response,send_evaluation
 
 
 
@@ -34,6 +34,10 @@ class LeetcodeDetails(BaseModel):
     question_id: int
     language:str
 
+class Evaluate(BaseModel):
+    steps: str
+    language: str
+    code: str
 
 #EndPoints:
 
@@ -49,7 +53,9 @@ async def leetcode_qn(details: LeetcodeDetails):
     description=leetcode_problem(frontend_id=details.question_id)["data"]["question"]["content"]
     return response(description,language=details.language)
 
-
+@app.post('/evaluate')
+async def evaluate_qn(content: Evaluate):    
+    return send_evaluation(steps=content.steps,language=content.language,code=content.code)
 
 
 #Endpoint for health check
