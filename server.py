@@ -84,7 +84,8 @@ async def save_content(question_data: QuestionModel):
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.get("/elab")
-async def elab_qn(language):
+async def elab_qn():
+    language="cpp"
     try:
         latest_question = get_latest_qn()
         if latest_question:
