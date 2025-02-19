@@ -9,17 +9,16 @@ import json
 from dotenv import load_dotenv
 import requests
 from Integrations.leetcode import leetcode_problem
-from prompt import response,send_evaluation
+from prompt import response,send_evaluation,get_latest_qn
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-from datetime import datetime
+from datetime import datetime,UTC
 
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
 db = client["Questions"]
-collection = db["Elab Questions"]
-
+collection = db["Elab_Questions"]
 
 #Initializing FastAPI
 app = FastAPI()
@@ -74,6 +73,7 @@ async def save_content(question_data: QuestionModel):
         qn = ' '.join(question_data.question.split("Constraints")[0].split())
         result = collection.insert_one({
             "question": qn,
+            "timestamp": datetime.utcnow()  # Add this line
         })
         return {
             "success": True,
@@ -82,14 +82,26 @@ async def save_content(question_data: QuestionModel):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/elab")
+async def elab_qn(language):
+    try:
+        latest_question = get_latest_qn()
+        if latest_question:
+            return response(question=latest_question,language=language)
+        return {"error": "No questions found"}
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}
+            
+
+
 
 
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
-    print (e)
-
+    print(e)
 
 
 
