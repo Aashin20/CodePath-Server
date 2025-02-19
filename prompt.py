@@ -7,10 +7,30 @@ from dotenv import load_dotenv
 from groq import Groq
 import json
 from dotenv import load_dotenv
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 groq_client = Groq(api_key=GROQ_API_KEY)
+MONGO_URI = os.getenv("MONGO_URI")
+client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
+db = client["Questions"]
+collection = db["Elab_Questions"]
+
+
+def get_latest_qn():
+    try:
+        latest_doc = collection.find_one(
+            {},
+            sort=[("timestamp", -1)]
+        )
+        if latest_doc and "question" in latest_doc:
+            return str(latest_doc["question"])
+        raise HTTPException("No Questions Found")
+    except Exception as e:
+        print(f"Error fetching latest question: {e}")
+
 
 def response(question, language):
     prompts = {
