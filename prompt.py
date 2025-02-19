@@ -43,7 +43,7 @@ def response(question, language):
       - "desired_output" as a string describing the expected output of the code, if any.
       - "hint" as a string providing a hint to help with the step.
 
-    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
+    Ensure that each step is indepth, detailed and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in JavaScript?":
     {
@@ -85,7 +85,7 @@ def response(question, language):
       - "hint" as a string providing a hint to help with the step.
 
 
-    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
+    Ensure that each step is indepth, detailed and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create more than 5 steps depending on complexity. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in C++?":
     {
@@ -135,7 +135,7 @@ def response(question, language):
       - "hint" as a string providing a hint to help with the step.
 
 
-    Ensure that each step is indepth and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
+    Ensure that each step is indepth, detailed and code is executable in isolation, and the final code can be constructed by combining all the steps. Atleast create 5 steps. Include essential elements like function definitions, return statements, and method calls.
 
     For example, for the question "How to implement a function to add two numbers in Python?":
     {
@@ -160,7 +160,7 @@ def response(question, language):
     }
       Now generate for {{QUESTION}}""",
     }
-    
+
     try:
         language_prompt = prompts[language]
         final_prompt = language_prompt.replace("{{QUESTION}}", question)
@@ -174,22 +174,22 @@ def response(question, language):
             max_tokens=8192
         )
         generated_code = completion.choices[0].message.content
-        
+
         print("Raw response:", generated_code)
-        
+
         generated_code = generated_code.strip()
-        
+
         if generated_code.startswith("```"):
             lines = generated_code.split("\n")
-            
+
             if lines[0].startswith("```"):
                 lines = lines[1:]
             if lines[-1].startswith("```"):
                 lines = lines[:-1]
             generated_code = "\n".join(lines)
-        
+
         generated_code = generated_code.strip()
-        
+
         try:
             parsed_code = json.loads(generated_code)
             return {"code": parsed_code}
@@ -200,7 +200,7 @@ def response(question, language):
                 status_code=500,
                 detail=f"Failed to parse JSON response: {str(json_error)}"
             )
-    
+
     except Exception as e:
         print("Error:", str(e))
         raise HTTPException(
@@ -211,10 +211,10 @@ def response(question, language):
 
 def evaluate(steps, language, code):
     try:
-        
+
         steps_array = json.loads(steps)
-        
-        prompt = f"""Here is the context and question for a coding exercise:
+
+        prompt = f"""Here is a NEW coding exercise to evaluate (ignore any previous exercises):
 
 Language: {language}
 steps: {steps}
@@ -222,22 +222,25 @@ steps: {steps}
 User's Code:
 {code}
 
-Please evaluate the user's code for the steps in the specified language and return feedback in the following structured JSON format:
+Please evaluate ONLY THIS specific code submission for the steps in the specified language and return feedback in the following structured JSON format:
 
 {{
   "feedback": "Provide detailed feedback about the correctness and quality of the user's code, including any issues related to logic, syntax, or code structure.",
+  "success": "If users code feedback is positive,ie success then complete=1 else complete=0"
 }}
 
 The evaluation should consider:
 1. The programming language and its conventions.
 2. Syntax correctness and adherence to the language's rules.
 3. The logic and overall structure of the code provided by the user.
+4. Do not mind about variable names as it can be anything. Just evaluate the logic.
 
-Return the steps as it is after adding the above JSON and updating the completed value. DO NOT ADD OR REMOVE ANY STEPS
+Return {steps} as it is after adding the above JSON and updating the completed value. DO NOT ADD OR REMOVE ANY STEPS
 Note: Evaluate the user's code against all steps and mark each step as:
 1: completed step
 0: current step (partially complete or in progress)
 -1: upcoming step (not started)
+
 """
         return prompt
     except Exception as e:
@@ -249,38 +252,53 @@ def send_evaluation(steps, language, code):
         completion = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": "You are a code evaluation assistant. Respond only with valid JSON."},
+                {"role": "system", "content": "You are a code evaluation assistant. Return only a single valid JSON object with feedback, complete status, and steps. No additional text or formatting."},
                 {"role": "user", "content": evaluation_prompt}
             ],
             temperature=0.7,
-            max_tokens=8192
+            max_tokens=8192,
         )
         evaluation_response = completion.choices[0].message.content
-        
+
         print("Raw evaluation response:", evaluation_response)
-        
+
+        # Clean up the response
         evaluation_response = evaluation_response.strip()
-        
-   
-        if evaluation_response.startswith("```"):
-            lines = evaluation_response.split("\n")
-            if lines[0].startswith("```"):
-                lines = lines[1:]
-            if lines[-1].startswith("```"):
-                lines = lines[:-1]
-            evaluation_response = "\n".join(lines)
-        
+
+      
+        if evaluation_response.startswith("```json"):
+            evaluation_response = evaluation_response[7:]
+        elif evaluation_response.startswith("```"):
+            evaluation_response = evaluation_response[3:]
+        if evaluation_response.endswith("```"):
+            evaluation_response = evaluation_response[:-3]
+
         evaluation_response = evaluation_response.strip()
-        
+
         try:
+           
+            start = evaluation_response.find('{')
+            end = evaluation_response.rindex('}') + 1
+            if start != -1 and end != -1:
+                evaluation_response = evaluation_response[start:end]
+
             parsed_evaluation = json.loads(evaluation_response)
-            return {"evaluation": parsed_evaluation}
+
+         
+            final_response = {
+                "feedback": parsed_evaluation.get("feedback", ""),
+                "complete": parsed_evaluation.get("complete", 0),
+                "steps": parsed_evaluation.get("steps", json.loads(steps))
+            }
+
+            return final_response
+
         except json.JSONDecodeError as json_error:
             raise HTTPException(
                 status_code=500,
                 detail=f"Failed to parse evaluation response: {str(json_error)}"
             )
-    
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
